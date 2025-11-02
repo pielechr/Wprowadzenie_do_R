@@ -119,3 +119,4 @@ no	pop	site	covera	coverb	coverc	slope	elev	dist_fem	radiation	adult_yew10	adult
 118	F	F18	10	40	30	5	460	30	104	0	102	0	0
 119	F	F19	0	65	20	10	471	48	101.7	0	92	0	0
 120	F	F20	30	60	40	10	480	52	101.7	0	56	300	0
+
