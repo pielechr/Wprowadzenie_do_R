@@ -1,0 +1,407 @@
+---
+title: "Ćwiczenie 08: Tworzenie wykresów z *ggplot2*"
+subtitle: "Materiały do kursu: Wprowadzenie do analizy danych w R (WBNZ-027, 2025/26)"
+
+date: "12.10.2025"
+author: "Remigiusz Pielech"
+
+format: html
+editor: visual
+---
+
+## 1. Przygotuj środowisko pracy
+
+### 1.1 Załaduj niezbędne pakiety
+
+```{r}
+library(tidyverse)
+library(RColorBrewer)
+library(viridis)
+```
+
+### 1.2 Wczytaj dane do ćwiczeń
+
+Wczytaj dane, które będziesz wykorzystywał(a) na ćwiczeniach.
+
+```{r}
+
+drapiezniki <- read_delim("https://raw.githubusercontent.com/pielechr/Wprowadzenie_do_R/refs/heads/main/drapiezniki.csv")
+
+juncus <- read_delim("https://raw.githubusercontent.com/pielechr/Wprowadzenie_do_R/refs/heads/main/Juncus.csv")
+```
+
+### 1.3 Zmiana domyślnego motywu (*theme*)
+
+Domyślnym motywem używanym do formatowania wykresów w *ggplot2* jest `theme_gray()`. Możesz zmienić sposób wyświetlania każdego nowego wykresu poprzez wykorzystanie innego motywu z predefiniowanymy ustawieniami wyglądy wykresów, np. `theme_bw()`. Jeśli chciałbyś zmienić globalnie domyślny motyw tak, aby wszystkie wykresy w danej sesji wykorzystywały określony motyw bez konieczności każdorazowego jego wskazywania, możesz użyć funkcji `theme_set()`.
+
+```{r}
+theme_set(theme_bw())
+
+```
+
+## 2. Filozfia pracy z `ggplot2`
+
+Przypomnijmy sobie podstawową filozofię tworzenia wykresów z pakietem `ggplot2`. Na wykres składają się trzy główne komponenty:
+
+-   **dane**
+
+-   **estetyka**
+
+-   **geometria**
+
+```{r}
+
+iris %>%                                                            # dane 
+  ggplot(aes(x = Species, y = Petal.Length, fill = Species)) +      # estetyka
+  geom_boxplot()                                                    # geometria
+```
+
+Wykres bazowy możesz zapisać jako obiekt i wywołać go w dowolnym momencie.
+
+```{r}
+plot1 <- iris %>%                                                   # dane 
+  ggplot(aes(x = Species, y = Petal.Length, fill = Species)) +      # estetyka
+  geom_boxplot()                                                    # geometria
+
+plot1
+
+```
+
+Możesz również dodawać do niego dodatkowe elementy, modyfikując w ten sposób wygląd wykresu:
+
+```{r}
+plot1 +
+  coord_flip()
+```
+
+Na rozgrzewkę, zmień opisy osi `x` i `y` za pomocą funkcji `labs()`
+
+```{r}
+
+
+```
+
+W dalszej części poznasz inne rodzaje wykresów, które generujemy poprzez wskazanie określonej geometrii za pomocą funkcji rozpoczynających się od `geom_`.
+
+## 3. Wykres skrzypcowy (*violin plot*)
+
+Wykresy skrzypcowe wykorzystujemy, gdy chcemy porównać rozkłady danych ilościowych. W praktyce, wykorzystujemy je często zamiennie z wykresami pudełkowymi (*boxplots*). O ile *boxplot* prezentuje ograniczone informacje nt. rozkładu danych, takie jak mediana, kwartyl czy rozstęp ćwiartkowy (IQR), *violin plot* daje pełniejszą informację nt. rozkładu. Wygląda jak wykres gęstości z jego odbiciem lustrzanym.
+
+Do tworzenia wykresów skrzypcowych służy `geom_violin()`. Kształt skrzypiec możemy zmienić za pomocą argumentu `trim`. W ten sposób kontrolujemy, czy skrzypce mają być docięte do wartości minimalnej i maksymalnej (wartość domyślna `TRUE`), czy też estymowane poza ich zakres (wygładzanie w wykresach gęstości). Dodatkowo, aby zwizualizować rozkład konkretnych wartości, możemy wykorzystać `geom_jitter()`, służący do rysowania punktów z dodanym niewielkim, losowym przesunięciem (szumem, ang. *jitter*). Celem przesunięcia jest rozdzielenie punktów, które nakładają się na siebie (nadmierne pokrywanie się, ang. *overplotting*).
+
+```{r}
+
+
+```
+
+Dobrym pomysłem jest połączenie wykresów skrzypcowych z nałożonym wąskim wykresem pudełkowym.
+
+```{r}
+
+
+```
+
+#### ZADANIE 8.1:
+
+Porównaj wysokość gatunków sitów za pomocą wykresów skrzypcowych.
+
+```{r}
+
+
+```
+
+## 4. Wykres rozrzutu (*scatter plot*)
+
+Wykresy rozrzutu wykorzystujemy zwykle do prezentacji zależności pomiędzy dwoma zmiennymi. Każda obserwacja w zbiorze danych jest prezentowana jako pojedynczy punkt. Wykres rozrzutu wykorzystujemy często aby zwizualizować analizę korelacji lub regresji. W przypadku regresji, zmienna niezależna (objaśniająca) jest zwykle prezentowana na osi poziomej, podczas gdy zmienna zależna (objaśniana) - na osi pionowej.
+
+Wykresy rozrzutu tworzymy za pomocą `geom_point()`. Zróbmy prosty wykres prezentujący związek pomiędzy długością płatków a długością działek:
+
+```{r}
+
+
+
+```
+
+Na wykresie widzimy dodatnią zależność pomiędzy długością płatków i działek. Możesz dodać do wykresu linię trendu za pomocą `geom_smooth()`. Za pomocą argumentu `method =` zmienisz metodę, z pomocą będzie generowana linia trendu. Wartość domyślna to `"loess"` czyli wygładzanie typowe dla regresji lokalnej (*locally estimated scatterplot smoothing, LOESS*). Inne możliwe wartości to `"lm"`, `"glm"` czy `"gam"`.
+
+```{r}
+
+
+
+  
+```
+
+Wygląd wykresu możesz zmienić poprzez modyfikowanie wybranych argumentów:
+
+```{r}
+
+
+
+```
+
+Na wykresie rozrzutu możesz wyróżnić kolorami różne grupy, np. gatunki. Co więcej, dla każdej grupy możesz stworzyć osobną linię trendu:
+
+```{r}
+
+
+```
+
+#### ZADANIE 8.2:
+
+Wykonaj wykres rozrzutu prezentujący zależność pomiędzy wysokością `Height` a długością kwiatostanów `InflLght`
+
+```{r}
+
+
+```
+
+## 5. Wykres gęstości (*density plot*)
+
+Do wykonania wykresów gęstości w pakiecie `ggplot2` wykorzystujemy `geom_density`. Za pomocą argumentów `fill =` i `color =` możesz zdefiniować grupy, np. wykonać wykresy gęstości osobno dla gatunków.
+
+```{r}
+
+
+
+```
+
+Narysujmy pionowe linie przebiegające w miejscu wartości średniej. Musimy najpierw obliczyć średnie długości płatków dla każdego gatunku
+
+```{r}
+
+
+
+```
+
+Teraz możemy dodać linie do wykresu za pomocą `geom_vline()`. Przejrzystość nadamy za pomocą argumentu `alpha =`.
+
+```{r}
+
+
+
+```
+
+#### ZADANIE 8.3:
+
+Wykonaj wykres gęstości dla zmiennej `CapsuleLgth` dla poszczególnych gatunków sitów.
+
+```{r}
+
+
+
+```
+
+## 6. Histogramy
+
+Do tworzenia histogramów służy `geom_histogram`. Pozwala on na elastyczne sterowanie liczbą (`bins =`) oraz wielkością (`binwidth =`) przedziałów.
+
+```{r}
+
+
+```
+
+Z łatwością możesz też wyróżnić na wykresie grupy (np. gatunki).
+
+```{r}
+
+
+```
+
+## 7. Wykres słupkowy (*bar plot*)
+
+Aby wykenerować wykres słupkowy za pomocą funkcji bazowych, musiałeś użyć funkcji `table()` zagnieżsżonej w `barplot()`.
+
+```{r}
+
+
+```
+
+Tworząc wykres słupkowy z `ggplot2` wygenerujemy podobne podsumowanie za pomocą `summarize()`. Tabelę z podsumowaniem wykorzystamy jako źródło danych dla wykresu słupkowego (geom_bar). Argument `stat = "identity"`wskazuje, że wysokość słupka ma odpowiadać podanej wartości.
+
+```{r}
+
+
+
+```
+
+#### ZADANIE 8.4:
+
+```{r}
+
+
+```
+
+## 8. Wykres liniowy
+
+Wykresy liniowe przedstawiają informacje w postaci punktów połączonych liniami.Taki wykres jest często używany do prezentowania trendów w czasie. Stworzymy wykres przedstawiający liczbę obserwacji wybranych drapieżników w czasie. Wykorzystamy `geom_point()` to narysowania punktów prezentujących konkretne wartości oraz `geom_line()` do połączenia ich liniami.
+
+Na początek stwórzny wykres z liczbą obserwacji rysi (*Lynx lynx*) w ostatnich 5 latach. Zaczynami od policzenia liczby obserwacji:
+
+```{r}
+
+rysie <- drapiezniki %>% 
+  filter(species == "Lynx lynx") %>% 
+  filter(year > 2020) %>% 
+  group_by(year) %>% 
+  summarise(obserwacje = n())
+rysie
+```
+
+Teraz możemy wygenerować wykres:
+
+```{r}
+
+
+```
+
+Sprawdźmy teraz, jak zmieniała się liczba obserwacji trzech największych drapieżników po 2010 roku.
+
+```{r}
+
+
+```
+
+## 9. Modyfikacja elementów wykresu
+
+### 9.1 Legenda
+
+Przyjrzyjmy się jednemu z wygenerowanych wykresów:
+
+```{r}
+plot2
+```
+
+Czasami zachodzi potrzeba modyfikacji legendy. **Tytuł** legendy jest generowany automatycznie. Jeśli chcemy go zmienić, możesz użyć poznanej już funkcji `labs()`.
+
+**Położenie** legendy zmienisz modyfikując motyw przy pomocy argumentu `legend.position =`.
+
+\*\* Etykiety legendy\*\* zmienisz modyfikując wartości skali. Nasza skala jest generowana przez argument `fill =`, dlatego właściwą funkcją będzie `scale_fill_discrete()`.
+
+```{r}
+
+
+```
+
+### 9.2 Kolory
+
+#### 9.2.1 Modyfikacja ręczna
+
+Kolory na wykresach z `ggplot2` można modyfikować na wiele sposobów. Najprostszy z nich to ręczne wprowadzenie wartości (kolorów) używanej skali.
+
+```{r}
+plot1
+```
+
+W tym przypadku kolory są generowane przez argument `fill =`, dlatego zdefiniujemy nowe kolory za pomocą funkcji `scale_fill_manual()`.
+
+```{r}
+plot1 +
+  scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9"))
+```
+
+Pamiętaj, że gdybyś chciał w ten sposób zmodyfikować np. obrysy, których kolory są kontrolowane przez argument `color =`, należałoby użyć funkcji `scale_color_manual()`.
+
+#### 9.2.2 ColorBrewer
+
+[ColorBrewer](https://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3) jest narzędziem pozwalającym dobranie profesjonalnie wyglądających palet kolorów na mapach. Pierwotnie został opracowany dla kartografów tworzących mapy w środowisku GIS. Palety te mogą być jednak z powodzeniem używane przy wizualizacji innych danych.
+
+Za pomocą dedykowanych funkcji pakietu `RColorBrewer` możemy przyjrzeć się i wybrać odpowiednią paletę
+
+```{r}
+
+
+```
+
+Wykorzystajmy paletę **Dark2** i zmodyfikujmy wykres skrzypcowy
+
+```{r}
+
+
+  
+```
+
+#### 9.2.3 `scale_fill_gray()`
+
+Możesz wykorzystać gotową skalę szarości
+
+```{r}
+
+
+```
+
+#### 9.2.4 `viridis`
+
+Paleta `viridis` jest zbudowana z kolorów, które nie tylko pomagają estetycznie zwizualizować dane, ale również są przyjazne dla osób z zaburzeniami postrzegania kolorów (*colorblindness*).
+
+```{r}
+
+
+
+```
+
+#### ZADANIE 8.5
+
+Zastosuj skalę `viridis` do wykresu rozrzutu prezentującego zależności pomiędzy długością płatków i działek dla trzech gatunków z rodzaju Iris,
+
+```{r}
+
+```
+
+## 10. Siatka wykresów (*facets*)
+
+Tworzenie siatki wykresów nazywa się potocznie **facetowaniem**. Jest to technika tworzenia siatki małych wykresów, gdzie każdy mały wykres przedstawia podzbiór danych.
+
+Zamieńmy format danych `iris` na długą tabelę
+
+```{r}
+iris_long <- iris %>% 
+  pivot_longer(cols = c(Petal.Length, Petal.Width, Sepal.Length, Sepal.Width),
+               names_to = "cecha",
+               values_to = "wartosc"
+    
+  )
+
+iris_long
+```
+
+Teraz zróbmy wykres porównujący wartości dla trzech gatunków. Ponieważ wartości będą prezentowały różne pomiary (długości i szerokości płatków i działek łącznie), wykres *de facto* nie będzie miał biologicznego sensu - jest to jedynie etap pośredni prowadzącu do właściwego celu.
+
+```{r}
+
+
+```
+
+Użyjemy teraz funkcji `facet_wrap()`, aby podzielić zbiór danych na cztery małe wykresy prezentujące porównanie każdej z cech. Użyjemy argumenty `scales = "free"`, aby skale `y` dla różnych zmiennych mogły mieć różne zakresy.
+
+```{r}
+
+
+```
+
+Teraz możemy jeszcze ręcznie zmienić etykiety naszych "facetek". Przygotujmy obiekt zawierający etykiety
+
+```{r}
+etykiety <- c(
+  Petal.Length = "Długość płatka",
+  Petal.Width  = "Szerokość płatka",
+  Sepal.Length = "Długość działki",
+  Sepal.Width  = "Szerokość działki")
+
+```
+
+Użyjemy teraz argumentu `labeller =` aby zmienić etykiety wykresów.
+
+```{r}
+
+
+```
+
+#### ZADANIE 8.6
+
+Wybierz 6 cech morfometrycznych sitów ze zbioru `juncus` i wykonaj siatkę wykresów prezentującą porównianie tych 6 cech pomiędzy gatunkami.
+
+```{r}
+
+
+
+```
